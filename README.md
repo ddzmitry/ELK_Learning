@@ -42,3 +42,94 @@ PUT /pages
 ```
 GET /_cat/shards?v
 ```
+
+### Adding node in configs
+```
+# In new instance change node name
+node.name: node-2
+# Start it 
+bin/elasticsearch
+# Get nodes (now its 2)
+GET /_cat/nodes?v
+```
+### Adding node by changing config in command line (not best option)
+```
+bin/elasticsearch -Enode.name=node-3 -Epath.data=./node-3/data -Epath.logs=./node-3/logs
+```
+
+### Master node
+```
+# config
+node.master: true|false
+```
+### Data node (store and search data)
+```
+# config
+node.data: true|false
+```
+### Ingest node (enables node to run ingest pipelines)
+> Ingest pipelines are a series of steps(processors) that are performed when indexing documents
+```
+# config
+node.ingest: true|false
+```
+#### Abbreviations 
+```
+GET /_cat/nodes?v
+
+node.role :dilmrt  - data,ingest,master
+
+
+```
+### Create Delete Index 
+```
+DELETE /pages
+# Specify shards and replicas
+PUT /products
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 2
+  }
+}
+```
+### Adding Data to index
+```
+POST /products/_doc
+{
+  "name":"Coffee Maker",
+  "price" : 64,
+  "in_stock": 10
+}
+# Add by key
+PUT /products/_doc/100
+{
+  "name":"Toaster",
+  "price" : 49,
+  "in_stock": 4
+
+}
+```
+### Getting Data from index
+```
+GET /products/_doc/100
+```
+
+### Updating data by id
+```
+POST /products/_update/100
+{
+  "doc": {
+    "in_stock" :3
+  }
+}
+
+# Add new field
+POST /products/_update/100
+{
+  "doc": {
+    "tags" : ["electronics"]
+  }
+}
+
+```
