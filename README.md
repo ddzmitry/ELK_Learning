@@ -23,4 +23,22 @@ curl -X GET "localhost:9200/_cat/nodes?v&pretty"
 ```
 > Cluster Health 
 GET /_cluster/health 
+> Get Nodes
+GET /_cat/nodes?v
+GET /_nodes
+> Get Indices
+GET /_cat/indices?v
+```
+### Curl
+```
+url -XGET "http://localhost:9200/_search" -H 'Content-Type: application/json' -d'{  "query": {    "match_all": {}  }}'
+```
+
+### Add Index
+```
+PUT /pages
+```
+### Get Shards
+```
+GET /_cat/shards?v
 ```
