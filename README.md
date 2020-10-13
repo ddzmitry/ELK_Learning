@@ -133,3 +133,72 @@ POST /products/_update/100
 }
 
 ```
+### Scripted Updates to Change Data
+> This script will decrease in_stock data by 1 (in_stock--)
+```
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  }
+}
+```
+> Set Value (hard coded)
+```
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock = 10"
+  }
+}
+```
+> Set Value using script and parameters ( params.qty is a variable that can be updated to apply to script)
+```
+POST /products/_update/100
+{
+  "script": {
+    "source": "ctx._source.in_stock -= params.qty",
+    "params": {
+      "qty" : 4
+    }
+  }
+}
+# Will decrease value in_stock by 4 
+```
+
+### Upserts (Update docs)
+```
+POST /products/_update/101
+{
+  "script": {
+    "source": "ctx._source.in_stock -= params.qty",
+    "params": {
+      "qty" : 4
+    }
+  },
+  "upsert": {
+    "name" : "Blender",
+    "price" : 399 ,
+    "in_stock" : 5
+  }
+}
+```
+
+### Replacing Doc 
+```
+GET /products/_doc/100
+# Will "re-put" value
+PUT /products/_doc/100
+{
+  "name" : "Toaster",
+  "price" : 50,
+  "in_stock" : 10
+
+}
+```
+
+### Delete Doc
+```
+DELETE /products/_doc/100
+
+```
