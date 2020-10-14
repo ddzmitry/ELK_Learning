@@ -205,3 +205,35 @@ DELETE /products/_doc/100
 ```
 shard_num = hash(_routing) % num_primary_shards
 ```
+### update by sequence 
+```
+First GET
+GET /products/_doc/100
+>> OUT 
+{
+  "_index" : "products",
+  "_type" : "_doc",
+  "_id" : "100",
+  "_version" : 18,
+  "_seq_no" : 22,
+  "_primary_term" : 1,
+  "found" : true,
+  "_source" : {
+    "name" : "Toaster",
+    "price" : 50,
+    "in_stock" : 10
+  }
+}
+
+
+
+Second post 
+POST /products/_update/100?if_primary_term=1&if_seq_no=22
+{
+  "doc": {
+    "in_stock" : 123
+  }
+}
+If you run second query again it will fail because sequence number had changed to 23
+
+```
