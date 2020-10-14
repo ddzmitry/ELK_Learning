@@ -200,5 +200,8 @@ PUT /products/_doc/100
 ### Delete Doc
 ```
 DELETE /products/_doc/100
-
+```
+### Number of Shards
+```
+shard_num = hash(_routing) % num_primary_shards
 ```
