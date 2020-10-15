@@ -237,3 +237,108 @@ POST /products/_update/100?if_primary_term=1&if_seq_no=22
 If you run second query again it will fail because sequence number had changed to 23
 
 ```
+
+### Update By query
+```
+# Run for all documents and decrease value by one 
+# Update many
+POST /products/_update_by_query
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  },
+  "query": {
+    "match_all": {}
+  }
+}
+
+>> OUT (query goes to coordinating node)
+{
+  "took" : 994,
+  "timed_out" : false,
+  "total" : 3,
+  "updated" : 3, - total records
+  "deleted" : 0,
+  "batches" : 1, - how many batches it took to retrieve document (using scroll API)
+  "version_conflicts" : 0,
+  "noops" : 0,
+  "retries" : {
+    "bulk" : 0,
+    "search" : 0
+  },
+  "throttled_millis" : 0,
+  "requests_per_second" : -1.0,
+  "throttled_until_millis" : 0,
+  "failures" : [ ]
+}
+
+
+```
+### To force update and ignore conflicts 
+```
+POST /products/_update_by_query
+{
+  "script": {
+    "source": "ctx._source.in_stock--"
+  },
+  "query": {
+    "match_all": {}
+  }
+}
+> Check updates
+# Get All
+GET /products/_search
+{
+    "query": {
+    "match_all": {}
+  }
+}
+```
+
+### Delete by query
+```
+Delete by Condition 
+
+POST /products/_delete_by_query
+{
+  "query": {
+    "match_all" : {}
+  }
+}
+```
+
+### Batch Processing - Add values via bulk request by id and pass values (have to be inline)
+> link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
+#### Post with bulk
+```
+# Batch Processing
+
+POST /_bulk
+{ "index" : { "_index" : "products", "_id" : 200 } }
+{ "name": "Espresso Machine", "price": 199 , "in_stock":5 }
+{ "create": { "_index" : "products", "_id" : 201 } }
+{ "name": "Milk Frother", "price": 149, "in_stock": 14 }
+
+```
+#### Update with bulk
+```
+POST /_bulk
+{ "update": { "_index" : "products", "_id" : 201 } }
+{ "doc" : {"name": "THE Milk Frother", "price": 180, "in_stock": 250 } }
+```
+#### Delete and update with bulk with index provided 
+```
+# We specify index right in the request , so we dont have to write it in body
+POST /products/_bulk
+{ "update": { "_id" : 201 } }
+{ "doc" : { "in_stock": 10 } }
+{ "delete": {  "_id" : 200 } }
+```
+
+### Importing with curl
+```
+url -H "Content-Type: application/x-ndjson" -XPOST http://localhost:9200/products/_bulk  --data-binary "@data.json"
+
+# Check shards to make sure documents there 
+GET /_cat/shards?v
+```
