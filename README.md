@@ -1,6 +1,8 @@
 # ELK_Learning
 
-### installing 
+
+
+## installing 
 ```
 docker pull docker.elastic.co/elasticsearch/elasticsearch:7.9.2
 docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -16,6 +18,9 @@ curl -X GET "localhost:9200/_cat/nodes?v&pretty"
 > A cluster collection of nodes
 > Data stored in documents, which are JSON
 > Documents grouped with indices
+
+
+## Managing documents 
 
 #### Queries
 
@@ -341,4 +346,8 @@ url -H "Content-Type: application/x-ndjson" -XPOST http://localhost:9200/product
 
 # Check shards to make sure documents there 
 GET /_cat/shards?v
+
 ```
+
+## Section 4 Mapping and Analysis
+### 
