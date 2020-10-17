@@ -376,7 +376,7 @@ POST /_analyze
 
 ```
 
-#### Coersion (different types)
+#### Coersion will work with type that can be converted to a float (different types will create both text and float mapping)
 ```
 PUT /coercian_test/_doc/1
 {
@@ -394,4 +394,123 @@ PUT /coercian_test/_doc/3
 }
 
 GET /coercian_test/_doc/2
+```
+#### NB Elastic Search dont use coersian , it forigves if we put two different types inside of field of the index 
+
+#### Array - Elastic will accept array as input value , because it only cares about text
+```
+# Verify by analyze API
+POST /_analyze
+{
+  "text": ["Strings are simply","merged together"],
+  "analyzer": "standard"
+}
+# Output
+{
+  "tokens" : [
+    {
+      "token" : "strings",
+      "start_offset" : 0,
+      "end_offset" : 7,
+      "type" : "<ALPHANUM>",
+      "position" : 0
+    },
+    {
+      "token" : "are",
+      "start_offset" : 8,
+      "end_offset" : 11,
+      "type" : "<ALPHANUM>",
+      "position" : 1
+    },
+    {
+      "token" : "simply",
+      "start_offset" : 12,
+      "end_offset" : 18,
+      "type" : "<ALPHANUM>",
+      "position" : 2
+    },
+    {
+      "token" : "merged",
+      "start_offset" : 19,
+      "end_offset" : 25,
+      "type" : "<ALPHANUM>",
+      "position" : 3
+    },
+    {
+      "token" : "together",
+      "start_offset" : 26,
+      "end_offset" : 34,
+      "type" : "<ALPHANUM>",
+      "position" : 4
+    }
+  ]
+}
+
+```
+#### NB All types in array can't be mixed (as long as they can be coersed it will work )
+> [Boolean,{Object}] - WILL NOT WORK
+
+```
+      "start_offset" : 26,
+      "end_offset" : 34,
+      Separates words like on a single line
+```
+
+### Adding Explicit Mapping
+```
+PUT /reviews 
+{
+  "mappings": {
+    "properties": {
+      "rating" : { "type": "float"},
+      "content" : {"type": "text"},
+      "product_id" : {"type": "integer"},
+      "author" : {
+        "properties": {
+          "first_name" : {"type": "text"},
+          "last_name" : {"type": "text"},
+          "email" : {"type": "keyword"}
+        }
+      }
+      
+    }
+  }
+}
+
+# Add Data
+PUT /reviews/_doc/1
+{
+  "rating" : 5.0 ,
+  "content" : "Great course! Bo really taught me a lot about ELK",
+  "product_id" : 123,
+  "author" : {
+    "first_name" : "Joe",
+    "last_name" : "Doe",
+    "email" : "johndoe@example.com"
+  }
+}
+
+```
+
+### Retrieving Mappings 
+```
+GET /reviews/_mapping
+# By field
+GET /reviews/_mapping/field/author.email
+GET /reviews/_mapping/field/rating
+```
+
+### Adding Mappings to existing index 
+```
+GET /reviews/_mapping
+
+# Add datefield mapping
+PUT /reviews/_mapping
+{
+  "properties": {
+    "created_at" : {
+      "type" : "date"
+    }
+  }
+}
 ```
