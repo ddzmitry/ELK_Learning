@@ -350,4 +350,48 @@ GET /_cat/shards?v
 ```
 
 ## Section 4 Mapping and Analysis
-### 
+####  Basic Analyzer
+```
+POST /_analyze
+{
+  "text": "This is a text to analyze",
+  "analyzer": "standard"
+}
+
+POST /_analyze
+{
+  "text": "This is a text to analyze ANALUZE",
+  "char_filter": [],
+  "tokenizer": "standard",
+  "filter": ["lowercase"]
+}
+```
+#### Analyze By keyword - by exact match works well for emails
+```
+POST /_analyze
+{
+  "text": "2 guys walk into   a bar, but the third... DUCKS!",
+  "analyzer": "keyword"
+}
+
+```
+
+#### Coersion (different types)
+```
+PUT /coercian_test/_doc/1
+{
+  "price" : 7.4
+}
+PUT /coercian_test/_doc/2
+{
+  "price" : "7.4"
+}
+
+# will fail adding doc
+PUT /coercian_test/_doc/3
+{
+  "price" : "7.4m"
+}
+
+GET /coercian_test/_doc/2
+```
