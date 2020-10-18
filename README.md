@@ -512,5 +512,6 @@ PUT /reviews/_mapping
       "type" : "date"
     }
   }
+  
 }
 ```
